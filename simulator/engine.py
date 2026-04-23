@@ -112,8 +112,9 @@ def _build_rarity_plan(cfg: SimConfig) -> dict[str, Any]:
 # --------------------------------------------------------------------------- #
 # Vectorized pull resolution
 # --------------------------------------------------------------------------- #
-def _popcount64(x: np.ndarray) -> np.ndarray:
-    """Vectorized 64-bit popcount."""
+def popcount64(x: np.ndarray) -> np.ndarray:
+    """Vectorized 64-bit popcount — used both for owned-count rollups and
+    by viz modules to derive per-day holdings from owned_by_day masks."""
     # SWAR trick on uint64.
     x = x.astype(np.uint64, copy=True)
     x = x - ((x >> np.uint64(1)) & np.uint64(0x5555555555555555))
@@ -123,6 +124,10 @@ def _popcount64(x: np.ndarray) -> np.ndarray:
     x = (x + (x >> np.uint64(4))) & np.uint64(0x0F0F0F0F0F0F0F0F)
     x = (x * np.uint64(0x0101010101010101)) >> np.uint64(56)
     return x.astype(np.int32)
+
+
+# Keep the old private alias so no internal caller breaks.
+_popcount64 = popcount64
 
 
 def _kth_set_bit(

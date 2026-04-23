@@ -6,7 +6,6 @@ import streamlit as st
 from simulator.config import SimConfig, config_hash, load_preset
 from simulator.engine import SimResult, run_simulation
 
-from ui.compare import render_compare
 from ui.dashboard import render_dashboard
 from ui.export import render_export
 from ui.sidebar import render_sidebar
@@ -53,13 +52,10 @@ def main() -> None:
         "the dashboard re-computes automatically."
     )
 
-    tab_single, tab_compare, tab_export = st.tabs(["Dashboard", "A/B Compare", "Export"])
+    tab_single, tab_export = st.tabs(["Dashboard", "Export"])
 
     with tab_single:
         render_dashboard(cfg, cached_run_simulation)
-
-    with tab_compare:
-        render_compare(cfg, cached_run_simulation)
 
     with tab_export:
         render_export(cached_run_simulation(cfg))

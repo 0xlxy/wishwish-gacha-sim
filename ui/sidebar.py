@@ -34,6 +34,11 @@ def render_sidebar(default_cfg: SimConfig) -> None:
     if st.sidebar.button("Load preset", use_container_width=True):
         try:
             st.session_state["current_config"] = load_preset(choice)
+            # Clear sticky widget state so the inline param bar reflects the
+            # freshly-loaded preset, not the previous session's edits.
+            for k in list(st.session_state.keys()):
+                if k.startswith(("pb_", "draw_editor", "tiers_editor", "segments_editor")):
+                    del st.session_state[k]
             st.rerun()
         except Exception as e:  # noqa: BLE001
             st.sidebar.error(f"Load failed: {e}")
