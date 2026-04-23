@@ -1,0 +1,55 @@
+{
+  "name": "mengjing_v1",
+  "series": {
+    "duration_days": 30,
+    "tiers": [
+      {
+        "name": "Common",
+        "character_count": 8,
+        "probability": 0.96,
+        "in_pity_pool": true,
+        "character_names": [
+          "Dreamie Cloud",
+          "Dreamie Pillow",
+          "Dreamie Bubble",
+          "Dreamie Moon",
+          "Dreamie Storm",
+          "Dreamie Clock",
+          "Dreamie Lullaby",
+          "Dreamie Tuck"
+        ]
+      },
+      {
+        "name": "Rare",
+        "character_count": 1,
+        "probability": 0.04,
+        "in_pity_pool": true,
+        "character_names": ["Dreamie Meteor"]
+      }
+    ]
+  },
+  "draw": {
+    "daily_free_draws": 1,
+    "single_pull_cost_wish": 80,
+    "ten_pull_cost_wish": 720,
+    "wish_per_usd": 100,
+    "pity_threshold": 10,
+    "pity_guarantee": "unowned_any",
+    "soft_pity_start": null,
+    "soft_pity_full": null
+  },
+  "population": {
+    "total_users": 10000,
+    "random_seed": 42,
+    "segments": [
+      {"name": "Whale",   "population_share": 0.01, "daily_active_rate": 0.90,
+       "extra_paid_pulls_min": 10, "extra_paid_pulls_max": 50, "stop_rule": "never_stop"},
+      {"name": "Dolphin", "population_share": 0.05, "daily_active_rate": 0.70,
+       "extra_paid_pulls_min": 3,  "extra_paid_pulls_max": 10, "stop_rule": "stop_on_complete"},
+      {"name": "Minnow",  "population_share": 0.20, "daily_active_rate": 0.50,
+       "extra_paid_pulls_min": 0,  "extra_paid_pulls_max": 2,  "stop_rule": "stop_on_complete"},
+      {"name": "F2P",     "population_share": 0.74, "daily_active_rate": 0.40,
+       "extra_paid_pulls_min": 0,  "extra_paid_pulls_max": 0,  "stop_rule": "never_stop"}
+    ]
+  }
+}
