@@ -1,8 +1,8 @@
 """Global CSS injection.
 
-Palette & type stack match https://codereview.withmartian.com/ — Work Sans at
-14 px base, Ant-Design-derived neutral tokens (rgba(0,0,0,0.88) text, #E5DFDF
-borders, 6 px radius), purple accent `#563fff`.
+Visual language modeled on https://codereview.withmartian.com/ — Ant-Design
+tokens, Work Sans at 14 px base. Demarcation is done with **flat 1 px borders
+and background tint**, not shadows, so stacked cards don't stack visual noise.
 """
 from __future__ import annotations
 
@@ -10,20 +10,24 @@ import streamlit as st
 
 
 # --------------------------------------------------------------------------- #
-# Tokens (also consumed by viz/theme.py so Plotly figures match).
+# Tokens (also consumed by viz/theme.py).
 # --------------------------------------------------------------------------- #
 TEXT_PRIMARY = "rgba(0, 0, 0, 0.88)"
 TEXT_SECONDARY = "rgba(0, 0, 0, 0.65)"
 TEXT_TERTIARY = "rgba(0, 0, 0, 0.45)"
 
-BG_BODY = "#FFFFFF"
-BG_LAYOUT = "#F5F5F5"
-BG_SUBTLE = "#FAFAFA"
+# Three-layer background hierarchy:
+#   app outer  =  white
+#   sidebar    =  #FAFAFA   (one step down)
+#   subtle fill =  #F7F7F7  (for KPI cards / hover zones)
+BG_APP = "#FFFFFF"
+BG_SIDEBAR = "#FAFAFA"
+BG_SUBTLE = "#F7F7F7"
 
-BORDER = "#E5DFDF"
-BORDER_STRONG = "#D9D9D9"
+BORDER = "#E8E4E4"        # standard 1 px divider
+BORDER_STRONG = "#D9D4D4"  # used sparingly — sidebar/tab separator
 
-ACCENT = "#563FFF"      # primary link / focus
+ACCENT = "#563FFF"
 ACCENT_SOFT = "#F0EDFF"
 SUCCESS = "#55C89F"
 ERROR = "#EE412B"
@@ -38,15 +42,7 @@ MONO_STACK = (
     '"Liberation Mono", Menlo, monospace'
 )
 
-SHADOW_CARD = (
-    "0 1px 2px -2px rgba(0,0,0,0.16), "
-    "0 3px 6px 0 rgba(0,0,0,0.08)"
-)
 
-
-# --------------------------------------------------------------------------- #
-# CSS — one long string, interpolated with the tokens above.
-# --------------------------------------------------------------------------- #
 _CSS = f"""
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -54,19 +50,17 @@ _CSS = f"""
 
 <style>
 /* ------------------------------------------------------------------------- */
-/* Base: Work Sans at 14 px, Ant-style neutrals                               */
+/* Base                                                                       */
 /* ------------------------------------------------------------------------- */
-html, body {{
+html, body, .stApp,
+[data-testid="stAppViewContainer"] > .main {{
     font-family: {FONT_STACK};
     font-size: 14px;
     line-height: 1.5;
     color: {TEXT_PRIMARY};
-    background: {BG_LAYOUT};
+    background: {BG_APP};
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-}}
-.stApp {{
-    background: {BG_LAYOUT};
 }}
 .stMarkdown, .stText, .stAlert, .stCaption, .stMetric, .stTabs,
 .stButton > button, .stTextInput, .stNumberInput, .stSelectbox,
@@ -78,7 +72,6 @@ code, pre, kbd, tt {{
     font-family: {MONO_STACK} !important;
     font-size: 0.92em;
 }}
-/* Preserve Material Icons glyph font */
 [class*="material-icons"], [class*="material-symbols"],
 [data-testid="stIconMaterial"], [data-testid*="Icon"] span {{
     font-family: "Material Symbols Rounded", "Material Symbols Outlined",
@@ -87,30 +80,27 @@ code, pre, kbd, tt {{
 }}
 
 /* ------------------------------------------------------------------------- */
-/* Main container: generous whitespace, centered                              */
+/* Main container                                                             */
 /* ------------------------------------------------------------------------- */
 .block-container {{
     padding-top: 1.25rem !important;
     padding-bottom: 3rem !important;
     max-width: 1320px;
-    background: {BG_BODY};
-}}
-[data-testid="stAppViewContainer"] > .main {{
-    background: {BG_BODY};
+    background: {BG_APP};
 }}
 
 /* ------------------------------------------------------------------------- */
-/* Typography scale                                                           */
+/* Typography                                                                 */
 /* ------------------------------------------------------------------------- */
 h1 {{
-    font-size: 28px !important;
+    font-size: 26px !important;
     font-weight: 600;
     color: {TEXT_PRIMARY};
     letter-spacing: -0.01em;
     margin-bottom: 0.25rem !important;
 }}
 h2 {{
-    font-size: 18px !important;
+    font-size: 17px !important;
     font-weight: 600;
     color: {TEXT_PRIMARY};
     margin-top: 1.5rem !important;
@@ -131,17 +121,18 @@ h4, h5 {{
 }}
 
 /* ------------------------------------------------------------------------- */
-/* Sidebar                                                                    */
+/* Sidebar — gray tint creates the separator, no heavy border                 */
 /* ------------------------------------------------------------------------- */
 [data-testid="stSidebar"] {{
     min-width: 260px !important;
     max-width: 280px !important;
-    background: {BG_BODY};
-    border-right: 1px solid {BORDER};
+    background: {BG_SIDEBAR} !important;
+    border-right: 1px solid {BORDER_STRONG} !important;
+    box-shadow: none !important;
 }}
 [data-testid="stSidebar"] .block-container {{
     padding-top: 1rem !important;
-    background: {BG_BODY};
+    background: {BG_SIDEBAR} !important;
 }}
 [data-testid="stSidebar"] h4 {{
     font-size: 11px !important;
@@ -152,16 +143,21 @@ h4, h5 {{
     margin-top: 1rem;
     margin-bottom: 0.25rem;
 }}
+[data-testid="stSidebar"] hr {{
+    border: none !important;
+    border-top: 1px solid {BORDER} !important;
+    margin: 0.75rem 0 !important;
+}}
 
 /* ------------------------------------------------------------------------- */
-/* KPI metric cards                                                           */
+/* KPI metric cards — flat, no shadow; subtle tint + 1 px border              */
 /* ------------------------------------------------------------------------- */
 [data-testid="stMetric"] {{
-    background: {BG_BODY};
+    background: {BG_APP};
     border: 1px solid {BORDER};
     padding: 12px 14px;
     border-radius: 6px;
-    box-shadow: {SHADOW_CARD};
+    box-shadow: none;
 }}
 [data-testid="stMetricLabel"] {{
     font-size: 11px !important;
@@ -178,15 +174,16 @@ h4, h5 {{
 }}
 
 /* ------------------------------------------------------------------------- */
-/* Inputs                                                                     */
+/* Inputs — flat                                                              */
 /* ------------------------------------------------------------------------- */
 .stTextInput > div > div > input,
 .stNumberInput > div > div > input,
 .stSelectbox > div > div {{
     border-radius: 6px !important;
-    border-color: {BORDER} !important;
-    background: {BG_BODY} !important;
+    border: 1px solid {BORDER} !important;
+    background: {BG_APP} !important;
     font-size: 13px !important;
+    box-shadow: none !important;
 }}
 .stTextInput > div > div > input:focus,
 .stNumberInput > div > div > input:focus {{
@@ -201,28 +198,33 @@ label p, .stNumberInput label, .stTextInput label, .stSelectbox label,
 }}
 
 /* ------------------------------------------------------------------------- */
-/* Buttons                                                                    */
+/* Buttons — flat                                                             */
 /* ------------------------------------------------------------------------- */
 .stButton > button {{
     border-radius: 6px;
     border: 1px solid {BORDER};
-    background: {BG_BODY};
+    background: {BG_APP};
     color: {TEXT_PRIMARY};
     font-size: 13px;
     font-weight: 500;
     padding: 6px 14px;
-    box-shadow: {SHADOW_CARD};
-    transition: all 0.15s ease;
+    box-shadow: none;
+    transition: border-color 0.15s ease, color 0.15s ease,
+                background 0.15s ease;
 }}
 .stButton > button:hover {{
     border-color: {ACCENT} !important;
     color: {ACCENT} !important;
-    background: {BG_BODY};
+    background: {BG_APP};
+}}
+.stButton > button:active {{
+    background: {ACCENT_SOFT} !important;
 }}
 .stButton > button[kind="primary"] {{
     background: {ACCENT};
     border-color: {ACCENT};
     color: #FFFFFF;
+    box-shadow: none;
 }}
 .stButton > button[kind="primary"]:hover {{
     background: #6E5BFF !important;
@@ -231,18 +233,24 @@ label p, .stNumberInput label, .stTextInput label, .stSelectbox label,
 }}
 
 /* ------------------------------------------------------------------------- */
-/* Expanders                                                                  */
+/* Expanders — flat                                                           */
 /* ------------------------------------------------------------------------- */
 [data-testid="stExpander"] {{
     border: 1px solid {BORDER};
     border-radius: 6px;
-    background: {BG_BODY};
-    box-shadow: {SHADOW_CARD};
+    background: {BG_APP};
+    box-shadow: none;
+}}
+[data-testid="stExpander"] summary {{
+    padding: 10px 14px !important;
 }}
 .streamlit-expanderHeader, [data-testid="stExpander"] summary {{
     font-size: 13px !important;
     font-weight: 500 !important;
     color: {TEXT_PRIMARY};
+}}
+[data-testid="stExpander"][aria-expanded="true"] {{
+    background: {BG_APP};
 }}
 
 /* ------------------------------------------------------------------------- */
@@ -275,14 +283,14 @@ hr {{
 }}
 
 /* ------------------------------------------------------------------------- */
-/* Plotly charts container                                                    */
+/* Plotly charts — flat card, border only, no shadow                          */
 /* ------------------------------------------------------------------------- */
 [data-testid="stPlotlyChart"] {{
     border: 1px solid {BORDER};
     border-radius: 6px;
-    padding: 8px;
-    background: {BG_BODY};
-    box-shadow: {SHADOW_CARD};
+    padding: 6px 6px 2px 6px;
+    background: {BG_APP};
+    box-shadow: none;
 }}
 
 /* ------------------------------------------------------------------------- */
@@ -290,13 +298,15 @@ hr {{
 /* ------------------------------------------------------------------------- */
 [data-testid="stDataFrameResizable"] {{
     border-radius: 6px;
+    border: 1px solid {BORDER};
+    box-shadow: none;
 }}
 [data-testid="stDataFrameResizable"] * {{
     font-size: 13px !important;
 }}
 
 /* ------------------------------------------------------------------------- */
-/* Section pill (small category tag above each section heading)               */
+/* Section pill                                                               */
 /* ------------------------------------------------------------------------- */
 .section-pill {{
     display: inline-block;
@@ -318,7 +328,7 @@ hr {{
 [data-baseweb="notification"] {{
     border-radius: 6px !important;
     border: 1px solid {BORDER} !important;
-    box-shadow: {SHADOW_CARD};
+    box-shadow: none !important;
 }}
 
 /* ------------------------------------------------------------------------- */
@@ -326,6 +336,7 @@ hr {{
 /* ------------------------------------------------------------------------- */
 header[data-testid="stHeader"] {{
     background: transparent;
+    box-shadow: none;
 }}
 </style>
 """
