@@ -40,6 +40,14 @@ def inline_params(cfg: SimConfig) -> SimConfig:
             value=int(cfg.draw.pity_threshold),
             step=1,
             key="pb_pity",
+            help=(
+                "Safety net: after this many consecutive pulls without a new "
+                "character, the next pull is forced to give one (under the "
+                "`unowned_any` rule). Example: threshold = 10 means every "
+                "10-pull window is guaranteed to contain ≥1 new character. "
+                "A lower value gives users more generous pity; a higher value "
+                "relies more on base probabilities."
+            ),
         )
     with c3:
         daily_free = st.number_input(
@@ -49,6 +57,11 @@ def inline_params(cfg: SimConfig) -> SimConfig:
             value=int(cfg.draw.daily_free_draws),
             step=1,
             key="pb_daily_free",
+            help=(
+                "How many pulls each user gets for free every day they're "
+                "active. Combined with the segment's DAU rate, this sets the "
+                "floor for F2P progression."
+            ),
         )
     with c4:
         duration = st.number_input(
@@ -58,6 +71,10 @@ def inline_params(cfg: SimConfig) -> SimConfig:
             value=int(cfg.series.duration_days),
             step=1,
             key="pb_duration",
+            help=(
+                "Length of the series in days. Each user is simulated day-by-"
+                "day until the series ends or their segment's stop rule fires."
+            ),
         )
 
     # Rebuild config with the tweaks, rescaling other tiers proportionally.
