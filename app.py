@@ -5,10 +5,12 @@ import streamlit as st
 
 from simulator.config import SimConfig, config_hash, load_preset
 from simulator.engine import SimResult, run_simulation
+
 from ui.compare import render_compare
 from ui.dashboard import render_dashboard
 from ui.export import render_export
 from ui.sidebar import render_sidebar
+from ui.style import inject as inject_css
 
 
 st.set_page_config(
@@ -16,6 +18,7 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
 )
+inject_css()
 
 
 # --------------------------------------------------------------------------- #
@@ -40,42 +43,26 @@ def main() -> None:
         st.session_state["default_cfg"] = load_preset("mengjing_v1")
     default_cfg: SimConfig = st.session_state["default_cfg"]
 
-    candidate, run_clicked, _save_name = render_sidebar(default_cfg)
+    # Sidebar updates st.session_state["current_config"] in place.
+    render_sidebar(default_cfg)
+    cfg: SimConfig = st.session_state.get("current_config", default_cfg)
 
-    st.title("WishWish gacha economy simulator")
+    st.markdown("# WishWish gacha economy simulator")
     st.caption(
-        "Monte Carlo simulation of series-level pulls, pity, and player segments. "
-        "Tune parameters in the sidebar, hit **Run simulation**, and watch the "
-        "distributions shift."
+        "Monte Carlo over pulls, pity, and segments. Edit parameters inline — "
+        "the dashboard re-computes automatically."
     )
 
-    tab_single, tab_compare, tab_export = st.tabs(["Single Run", "A/B Compare", "Export"])
+    tab_single, tab_compare, tab_export = st.tabs(["Dashboard", "A/B Compare", "Export"])
 
-    if run_clicked and candidate is not None:
-        st.session_state["last_result_hash"] = config_hash(candidate)
-        st.session_state["last_cfg"] = candidate
-
-    # Decide what to render on the Single Run tab.
     with tab_single:
-        active_cfg: SimConfig | None = st.session_state.get("last_cfg", candidate)
-        if active_cfg is None:
-            st.info("Fix the sidebar errors, then hit **Run simulation**.")
-        else:
-            if "last_cfg" not in st.session_state:
-                st.info("Hit **Run simulation** in the sidebar to render the dashboard.")
-            else:
-                result = cached_run_simulation(active_cfg)
-                render_dashboard(result)
+        render_dashboard(cfg, cached_run_simulation)
 
     with tab_compare:
-        render_compare(candidate)
+        render_compare(cfg, cached_run_simulation)
 
     with tab_export:
-        last_cfg: SimConfig | None = st.session_state.get("last_cfg")
-        if last_cfg is None:
-            st.info("Run a simulation first.")
-        else:
-            render_export(cached_run_simulation(last_cfg))
+        render_export(cached_run_simulation(cfg))
 
 
 if __name__ == "__main__":
