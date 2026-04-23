@@ -233,24 +233,34 @@ label p, .stNumberInput label, .stTextInput label, .stSelectbox label,
 }}
 
 /* ------------------------------------------------------------------------- */
-/* Expanders — flat                                                           */
+/* Expanders — flat, single border                                            */
 /* ------------------------------------------------------------------------- */
 [data-testid="stExpander"] {{
     border: 1px solid {BORDER};
     border-radius: 6px;
     background: {BG_APP};
     box-shadow: none;
+    overflow: hidden;
+}}
+/* Streamlit wraps the body in a <details>/inner div that ships with its own
+   border + radius. Null them so the outer wrapper's border is the only one. */
+[data-testid="stExpander"] > details,
+[data-testid="stExpander"] > details > div,
+[data-testid="stExpanderDetails"],
+[data-testid="stExpander"] [data-baseweb="block"] {{
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
 }}
 [data-testid="stExpander"] summary {{
     padding: 10px 14px !important;
+    border: none !important;
 }}
 .streamlit-expanderHeader, [data-testid="stExpander"] summary {{
     font-size: 13px !important;
     font-weight: 500 !important;
     color: {TEXT_PRIMARY};
-}}
-[data-testid="stExpander"][aria-expanded="true"] {{
-    background: {BG_APP};
 }}
 
 /* ------------------------------------------------------------------------- */
@@ -283,7 +293,7 @@ hr {{
 }}
 
 /* ------------------------------------------------------------------------- */
-/* Plotly charts — flat card, border only, no shadow                          */
+/* Plotly charts — flat card, single border                                   */
 /* ------------------------------------------------------------------------- */
 [data-testid="stPlotlyChart"] {{
     border: 1px solid {BORDER};
@@ -291,15 +301,31 @@ hr {{
     padding: 6px 6px 2px 6px;
     background: {BG_APP};
     box-shadow: none;
+    overflow: hidden;
+}}
+[data-testid="stPlotlyChart"] > div,
+[data-testid="stPlotlyChart"] .js-plotly-plot,
+[data-testid="stPlotlyChart"] .plot-container {{
+    border: none !important;
+    box-shadow: none !important;
 }}
 
 /* ------------------------------------------------------------------------- */
-/* DataFrame / data_editor                                                    */
+/* DataFrame / data_editor — single border on outer wrapper                   */
 /* ------------------------------------------------------------------------- */
-[data-testid="stDataFrameResizable"] {{
+[data-testid="stDataFrame"],
+[data-testid="stDataEditor"] {{
     border-radius: 6px;
     border: 1px solid {BORDER};
     box-shadow: none;
+    overflow: hidden;
+}}
+[data-testid="stDataFrame"] [data-testid="stDataFrameResizable"],
+[data-testid="stDataEditor"] [data-testid="stDataFrameResizable"],
+[data-testid="stDataFrameResizable"] {{
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
 }}
 [data-testid="stDataFrameResizable"] * {{
     font-size: 13px !important;
